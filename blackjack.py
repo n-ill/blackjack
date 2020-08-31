@@ -28,14 +28,8 @@ class Blackjack(Deck):
         self.player_total = 0
         self.dealer_total = 0
 
-        self.player_soft = True
-        self.dealer_soft = True
-
-        self.player_need_to_calc_ace = False
-        self.dealer_need_to_calc_ace = False
-
-        self.player_indexes_of_ace = []
-        self.dealer_indexes_of_ace = []
+        self.player_num_of_ace = 0
+        self.dealer_num_of_ace = 0
 
     def deal(self): #alternate dealing cards from top of deck to player and dealer until both have 2
         self.player_cards.append(self.deck[0])
@@ -47,24 +41,23 @@ class Blackjack(Deck):
         self.dealer_cards.append(self.deck[0])
         del self.deck[0]
 
-    def calc_player_total(self): # aces not being calced correctly
+    def calc_player_total(self): 
         self.player_total = 0
+
         for card in self.player_cards:
             if card[0] == 'J' or card[0] == 'Q' or card[0] == 'K':
                 self.player_total += 10
             elif card[0] == 'A':
-                self.player_need_to_calc_ace = True
-                self.player_indexes_of_ace.append(self.player_cards.index(card))
+                self.player_num_of_ace += 1
             else:
                 self.player_total += card[0]
-        if self.player_need_to_calc_ace:
-            for index in self.player_indexes_of_ace:
-                if self.player_total + 11 > 21:
-                    self.player_soft = False
-                if self.player_soft:
-                    self.player_total += 11
-                else:
+
+        if self.player_num_of_ace > 0:
+            for i in range(self.player_num_of_ace):
+                if self.player_total + 11 > 21: # if adding 11 would bust us
                     self.player_total += 1
+                else:
+                    self.player_total += 11
 
     def calc_dealer_total(self):
         self.dealer_total = 0
@@ -72,18 +65,15 @@ class Blackjack(Deck):
             if card[0] == 'J' or card[0] == 'Q' or card[0] == 'K':
                 self.dealer_total += 10
             elif card[0] == 'A':
-                self.dealer_need_to_calc_ace = True
-                self.dealer_indexes_of_ace.append(self.dealer_cards.index(card))
+                self.dealer_num_of_ace += 1
             else:
                 self.dealer_total += card[0]
-        if self.dealer_need_to_calc_ace:
-            for index in self.dealer_indexes_of_ace:
+        if self.dealer_num_of_ace > 0:
+            for i in range(self.dealer_num_of_ace):
                 if self.dealer_total + 11 > 21:
-                    self.dealer_soft = False
-                if self.dealer_soft:
-                    self.dealer_total += 11
-                else:
                     self.dealer_total += 1
+                else:
+                    self.dealer_total += 11
 
     def player_hit(self):
         self.player_cards.append(self.deck[0])
@@ -163,3 +153,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
