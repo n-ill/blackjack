@@ -109,19 +109,13 @@ while not game_over:
             button_deal.draw(screen, (0,0,0))
 
         if has_dealt:
-            if game.player_total == 21:
-                draw_text('Blackjack!', screen, 350, 475, 75)
-                draw_text('You Win!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
-            if game.player_total > 21:
-                draw_text('Bust!', screen, 350, 475, 50)
-                draw_text('You Lose!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
-
             draw_player_cards(screen, game)
             draw_text(str(game.player_total), screen, 500, 625, 30)  # player's score
 
             if players_turn:
-                button_hit.draw(screen, (0, 0, 0))
-                button_stand.draw(screen, (0, 0, 0))
+                if not done:
+                    button_hit.draw(screen, (0, 0, 0))
+                    button_stand.draw(screen, (0, 0, 0))
                 draw_inital_dealer_cards(screen, game)
             else:  # dealer's turn
                 draw_dealer_cards(screen, game)
@@ -132,21 +126,35 @@ while not game_over:
                 else:
                     done = True
 
-            if game.dealer_total == 21:
-                draw_text('Blackjack!', screen, 350, 50, 75)
-                draw_text('You Lose!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
-            if game.dealer_total > 21:
-                draw_text('Bust!', screen, 350, 50, 50)
-                draw_text('You Win!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
-            if done:
-                if game.player_total == game.dealer_total:
+            if game.player_total == 21:
+                draw_text('Blackjack!', screen, 300, 475, 100)
+                draw_text('You Win!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
+                done = True
+            elif game.player_total > 21:
+                draw_text('Bust!', screen, 350, 475, 50)
+                draw_text('You Lose!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
+                done = True
+            else:
+                if game.dealer_total == 21:
+                    draw_text('Blackjack!', screen, 300, 50, 100)
+                    draw_text('You Lose!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
+                    done = True
+                elif game.dealer_total > 21:
+                    draw_text('Bust!', screen, 350, 50, 50)
+                    draw_text('You Win!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
+                    done = True
+                elif game.player_total == game.dealer_total:
                     draw_text('Tie!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 50)
-                elif game.player_total > game.dealer_total:
-                    draw_text('You Win!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
+                    done = True
                 else:
-                    draw_text('You Lose!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
+                    if done:
+                        if game.player_total > game.dealer_total:
+                            draw_text('You Win!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
+                        else:
+                            draw_text('You Lose!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
 
-                button_play_again.draw(screen, (0, 0, 0))
+        if done:
+            button_play_again.draw(screen, (0, 0, 0))
 
         # events
         for event in pygame.event.get():
