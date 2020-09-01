@@ -1,3 +1,5 @@
+# command-line blackjack game
+
 import random, time
 
 class Deck:
@@ -41,7 +43,7 @@ class Blackjack(Deck):
         self.dealer_cards.append(self.deck[0])
         del self.deck[0]
 
-    def calc_player_total(self): 
+    def calc_player_total(self):
         self.player_total = 0
 
         for card in self.player_cards:
