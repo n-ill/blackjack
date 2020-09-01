@@ -90,96 +90,109 @@ for suit in ['S', 'C', 'H', 'D']:  # spades, clubs, hearts, diamonds
 button_deal = button((0, 255, 255), 800, 600, 50, 50, 'Deal')
 button_hit = button((0, 255, 0), 200, 600, 50, 50, 'Hit')
 button_stand = button((255, 0, 0), 275, 600, 50, 50, 'Stand')
+button_play_again = button((200, 200, 200), 800, 500, 100, 50, 'Play Again')
 
-game = blackjack.Blackjack()
-game.shuffle()
+game_over = False
+while not game_over:
+    game = blackjack.Blackjack()
+    game.shuffle()
 
-has_dealt = False
-players_turn = True
-running = True
-done = False
+    has_dealt = False
+    players_turn = True
+    running = True
+    done = False
 
-while running:
-    screen.blit(background, (0, 0))
+    while running:
+        screen.blit(background, (0, 0))
 
-    if not has_dealt:
-        button_deal.draw(screen, (0,0,0))
+        if not has_dealt:
+            button_deal.draw(screen, (0,0,0))
 
-    if has_dealt:
-        if game.player_total == 21:
-            draw_text('Blackjack!', screen, 350, 475, 75)
-            draw_text('You Win!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
-        if game.player_total > 21:
-            draw_text('Bust!', screen, 350, 475, 50)
-            draw_text('You Lose!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
+        if has_dealt:
+            if game.player_total == 21:
+                draw_text('Blackjack!', screen, 350, 475, 75)
+                draw_text('You Win!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
+            if game.player_total > 21:
+                draw_text('Bust!', screen, 350, 475, 50)
+                draw_text('You Lose!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
 
-        if players_turn:
-            button_hit.draw(screen, (0, 0, 0))
-            button_stand.draw(screen, (0, 0, 0))
-            draw_inital_dealer_cards(screen, game)
-        else:  # dealer's turn
-            draw_dealer_cards(screen, game)
-            game.calc_dealer_total()
-            draw_text(str(game.dealer_total), screen, 500, 205, 30)  # dealer's score
-            if game.dealer_total < 17:
-                game.dealer_hit()
-            else:
-                done = True
+            draw_player_cards(screen, game)
+            draw_text(str(game.player_total), screen, 500, 625, 30)  # player's score
 
-        if game.dealer_total == 21:
-            draw_text('Blackjack!', screen, 350, 50, 75)
-            draw_text('You Lose!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
-        if game.dealer_total > 21:
-            draw_text('Bust!', screen, 350, 50, 50)
-            draw_text('You Win!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
-        if done:
-            if game.player_total == game.dealer_total:
-                draw_text('Tie!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 50)
-            elif game.player_total > game.dealer_total:
-                draw_text('You Win!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
-            else:
-                draw_text('You Lose!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
+            if players_turn:
+                button_hit.draw(screen, (0, 0, 0))
+                button_stand.draw(screen, (0, 0, 0))
+                draw_inital_dealer_cards(screen, game)
+            else:  # dealer's turn
+                draw_dealer_cards(screen, game)
+                game.calc_dealer_total()
+                draw_text(str(game.dealer_total), screen, 500, 205, 30)  # dealer's score
+                if game.dealer_total < 17:
+                    game.dealer_hit()
+                else:
+                    done = True
 
+            if game.dealer_total == 21:
+                draw_text('Blackjack!', screen, 350, 50, 75)
+                draw_text('You Lose!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
+            if game.dealer_total > 21:
+                draw_text('Bust!', screen, 350, 50, 50)
+                draw_text('You Win!', screen, int(WIDTH/2) - 25, int(HEIGHT/2), 100)
+            if done:
+                if game.player_total == game.dealer_total:
+                    draw_text('Tie!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 50)
+                elif game.player_total > game.dealer_total:
+                    draw_text('You Win!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
+                else:
+                    draw_text('You Lose!', screen, int(WIDTH / 2) - 25, int(HEIGHT / 2), 100)
 
-        draw_player_cards(screen, game)
-        draw_text(str(game.player_total), screen, 500, 625, 30) # player's score
+                button_play_again.draw(screen, (0, 0, 0))
 
+        # events
+        for event in pygame.event.get():
+            pos = pygame.mouse.get_pos()
 
-    # events
-    for event in pygame.event.get():
-        pos = pygame.mouse.get_pos()
+            if event.type == pygame.QUIT:
+                running = False
+                game_over = True
 
-        if event.type == pygame.QUIT:
-            running = False
+            # clicking buttons
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_deal.isOver(pos):
+                    game.deal()
+                    game.calc_player_total()
+                    has_dealt = True
+                if button_hit.isOver(pos):
+                    game.player_hit()
+                    game.calc_player_total()
+                if button_stand.isOver(pos):
+                    players_turn = False
+                if button_play_again.isOver(pos):
+                    running = False
 
-        # clicking buttons
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if button_deal.isOver(pos):
-                game.deal()
-                game.calc_player_total()
-                has_dealt = True
-            if button_hit.isOver(pos):
-                game.player_hit()
-                game.calc_player_total()
-            if button_stand.isOver(pos):
-                players_turn = False
+            # hovering buttons
+            if event.type == pygame.MOUSEMOTION:
+                if button_deal.isOver(pos):
+                    button_deal.color = (0,175,175)
+                else:
+                    button_deal.color = (0, 255, 255)
 
-        # hovering buttons
-        if event.type == pygame.MOUSEMOTION:
-            if button_deal.isOver(pos):
-                button_deal.color = (0,175,175)
-            else:
-                button_deal.color = (0, 255, 255)
+                if button_hit.isOver(pos):
+                    button_hit.color = (0,175,0)
+                else:
+                    button_hit.color = (0, 255, 0)
 
-            if button_hit.isOver(pos):
-                button_hit.color = (0,175,0)
-            else:
-                button_hit.color = (0, 255, 0)
+                if button_stand.isOver(pos):
+                    button_stand.color = (175,0,0)
+                else:
+                    button_stand.color = (255, 0, 0)
 
-            if button_stand.isOver(pos):
-                button_stand.color = (175,0,0)
-            else:
-                button_stand.color = (255, 0, 0)
+                if button_play_again.isOver(pos):
+                    button_play_again.color = (120, 120, 120)
+                else:
+                    button_play_again.color = (200, 200, 200)
 
-    pygame.display.flip()
-    clock.tick(60)
+        pygame.display.flip()
+        clock.tick(60)
+
+pygame.quit()
